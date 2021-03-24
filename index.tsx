@@ -16,16 +16,27 @@ interface AppState {
   textContent: string;
 }
 
+interface BoxPayload {
+  cctv: number;
+  box: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
+  style: React.CSSProperties;
+}
+
 const socket = io("wss://proxy.hwangsehyun.com/webrtc-onvif", {
-  transports: ['websocket']
+  transports: ["websocket"]
 });
 
 class App extends Component<AppProps, AppState> {
   constructor(props) {
     super(props);
 
-    const PAYLOAD = {
-      CCTV: 0,
+            const PAYLOAD: BoxPayload = {
+      cctv: 0,
       box: {
         top: 0.1,
         bottom: 0.2,
@@ -37,8 +48,14 @@ class App extends Component<AppProps, AppState> {
       }
     };
 
+    const events = fromEvent(socket, "box");
+    events.subscribe(console.log);
+    const payloads = events.pipe(
+      map(([id, payload]) => {
+
+
     const style: React.CSSProperties =
-      typeof PAYLOAD.style === "object" ? PAYLOAD.style : {};
+      typeof payload.style === "object" ? payload.style : {};
     Object.entries(PAYLOAD.box).forEach(
       ([key, value]) => (style[key] = 100 * value + "%")
     );
@@ -48,19 +65,18 @@ class App extends Component<AppProps, AppState> {
       textContent: "Start editing to see some magic happen :)"
     };
     console.log(this.state);
-    
-    const events = fromEvent(socket, "box");
-    events.subscribe(console.log);
-    events.subscribe(([id, payload])=>console.log(id,payload));
+      })
+    );
+    payloads.subscribe(console.log);
   }
 
   render() {
-    return (
+    return this.state? (
       <div className="box">
         <Hello src={this.state.src} />
         <div style={this.state.style}>{this.state.textContent}</div>
       </div>
-    );
+    ) : (<div></div>);
   }
 }
 
