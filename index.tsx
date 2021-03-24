@@ -35,7 +35,7 @@ class App extends Component<AppProps, AppState> {
   constructor(props) {
     super(props);
 
-            const PAYLOAD: BoxPayload = {
+    const PAYLOAD: BoxPayload = {
       cctv: 0,
       box: {
         top: 0.1,
@@ -50,33 +50,36 @@ class App extends Component<AppProps, AppState> {
 
     const events = fromEvent(socket, "box");
     events.subscribe(console.log);
+
     const payloads = events.pipe(
       map(([id, payload]) => {
+        const style: React.CSSProperties =
+          typeof payload.style === "object" ? payload.style : {};
+        Object.entries(PAYLOAD.box).forEach(
+          ([key, value]) => (style[key] = 100 * value + "%")
+        );
 
+        this.state = {
+          style,
+          textContent: "Start editing to see some magic happen :)"
+        };
 
-    const style: React.CSSProperties =
-      typeof payload.style === "object" ? payload.style : {};
-    Object.entries(PAYLOAD.box).forEach(
-      ([key, value]) => (style[key] = 100 * value + "%")
-    );
-
-    this.state = {
-      style,
-      textContent: "Start editing to see some magic happen :)"
-    };
-    console.log(this.state);
+        console.log(123123, this.state);
+        return this.state;
       })
     );
     payloads.subscribe(console.log);
   }
 
   render() {
-    return this.state? (
+    return this.state ? (
       <div className="box">
         <Hello src={this.state.src} />
         <div style={this.state.style}>{this.state.textContent}</div>
       </div>
-    ) : (<div></div>);
+    ) : (
+      <div />
+    );
   }
 }
 
