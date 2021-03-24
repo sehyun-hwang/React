@@ -68,7 +68,7 @@ class App extends Component<AppProps, AppState> {
         return this.state;
       })
     );
-    payloads.subscribe(console.log);
+    payloads.subscribe(this.setState.bind(this));
   }
 
   render() {
@@ -78,7 +78,7 @@ class App extends Component<AppProps, AppState> {
         <div style={this.state.style}>{this.state.textContent}</div>
       </div>
     ) : (
-      <div />
+      <div>foo</div>
     );
   }
 }
