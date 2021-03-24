@@ -16,7 +16,9 @@ interface AppState {
   textContent: string;
 }
 
-const socket = io("wss://proxy.hwangsehyun.com/webrtc-onvif");
+const socket = io("wss://proxy.hwangsehyun.com/webrtc-onvif", {
+  transports: ['websocket']
+});
 
 class App extends Component<AppProps, AppState> {
   constructor(props) {
