@@ -3,6 +3,9 @@ import { render } from "react-dom";
 import Hello from "./Hello";
 import "./style.css";
 
+import { fromEvent } from "rxjs";
+import { filter } from "rxjs/operators";
+
 // @ts-ignore
 import { io } from "socket.io-client";
 
@@ -32,7 +35,8 @@ class App extends Component<AppProps, AppState> {
       }
     };
 
-    const style: React.CSSProperties = typeof PAYLOAD.style ==='object'?  PAYLOAD.style : {};
+    const style: React.CSSProperties =
+      typeof PAYLOAD.style === "object" ? PAYLOAD.style : {};
     Object.entries(PAYLOAD.box).forEach(
       ([key, value]) => (style[key] = 100 * value + "%")
     );
@@ -42,7 +46,9 @@ class App extends Component<AppProps, AppState> {
       textContent: "Start editing to see some magic happen :)"
     };
     console.log(this.state);
-    setInterval(() => socket.send({}), 1000);
+    
+    const clicks = fromEvent(socket, "box");
+    clicks.subscribe(x => console.log(x));
   }
 
   render() {
