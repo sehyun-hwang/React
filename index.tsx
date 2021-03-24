@@ -4,7 +4,7 @@ import Hello from "./Hello";
 import "./style.css";
 
 import { fromEvent } from "rxjs";
-import { filter } from "rxjs/operators";
+import { map } from "rxjs/operators";
 
 // @ts-ignore
 import { io } from "socket.io-client";
@@ -12,7 +12,7 @@ import { io } from "socket.io-client";
 interface AppProps {}
 interface AppState {
   src?: string;
-  style: object;
+  style: React.CSSProperties;
   textContent: string;
 }
 
@@ -47,8 +47,9 @@ class App extends Component<AppProps, AppState> {
     };
     console.log(this.state);
     
-    const clicks = fromEvent(socket, "box");
-    clicks.subscribe(x => console.log(x));
+    const events = fromEvent(socket, "box");
+    events.subscribe(console.log);
+    events.subscribe(([id, payload])=>console.log(id,payload));
   }
 
   render() {
