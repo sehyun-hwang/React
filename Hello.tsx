@@ -49,9 +49,15 @@ export const getMedia = ({ src }) =>
   ) : (
     <img src="https://i2-prod.belfastlive.co.uk/incoming/article13722455.ece/ALTERNATES/s615/1PNG.png" />
   );
-
+const defaultBorderColor = getComputedStyle(document.body).getPropertyValue(
+  "--default-box-border"
+);
 export const getBox = ({ id, style }) => {
-  <div style={style}>
-    <span style={{ background: style.borderColor }}>{id}</span>
-  </div>;
+  return (
+    <div style={style}>
+      <span style={{ background: style.borderColor || defaultBorderColor }}>
+        <span className="mix-blend">{id}</span>
+      </span>
+    </div>
+  );
 };

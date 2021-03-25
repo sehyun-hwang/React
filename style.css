@@ -1,3 +1,7 @@
+:root {
+  --default-box-border: red;
+}
+
 .flex-row {
   display: flex;
 }
@@ -14,9 +18,14 @@
 }
 .box div {
   position: absolute;
-  border: solid red 3px;
+  border: solid var(--default-box-border) 3px;
   top: 10%;
   bottom: 10%;
   left: 10%;
   right: 10%;
+}
+
+ .mix-blend {
+  color: var(--default-box-border);
+  mix-blend-mode: difference;
 }
