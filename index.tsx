@@ -11,9 +11,10 @@ import { io } from "socket.io-client";
 
 interface AppProps {}
 interface AppState {
+  id: string;
   src?: string;
   style: React.CSSProperties;
-  textContent: string;
+  comment: string;
 }
 
 interface BoxPayload {
@@ -21,6 +22,7 @@ interface BoxPayload {
   timestamp?: Date;
   boxs: [
     {
+      id: string;
       box: {
         top: number;
         bottom: number;
@@ -28,57 +30,61 @@ interface BoxPayload {
         right: number;
       };
       style?: React.CSSProperties;
-      comment?:string;
+      comment?: string;
     }
   ];
 }
+
+const PAYLOAD: BoxPayload = {
+  cctv: 0,
+  boxs: [
+    {
+      id: "person-1",
+      box: {
+        top: 0.1,
+        bottom: 0.2,
+        left: 0.3,
+        right: 0.4
+      },
+      style: {
+        color: "red"
+      }
+    }
+  ]
+};
 
 const socket = io("wss://proxy.hwangsehyun.com/webrtc-onvif", {
   transports: ["websocket"]
 });
 
-class App extends Component<AppProps, AppState> {
+class App extends Component<AppProps, AppState[]> {
   constructor(props) {
     super(props);
-
-    const PAYLOAD: BoxPayload = {
-      cctv: 0,
-      boxs: [
-        {
-          box: {
-            top: 0.1,
-            bottom: 0.2,
-            left: 0.3,
-            right: 0.4
-          },
-          style: {
-            color: "red"
-          }
-        }
-      ]
-    };
 
     const events = fromEvent(socket, "box");
     events.subscribe(console.log);
 
     const payloads = events.pipe(
-      map(([id, payload]) => {
+      map(([id, payload]: [number, BoxPayload]) => {
 
-        const style: React.CSSProperties =
-          typeof payload.style === "object" ? payload.style : {};
-        Object.entries(PAYLOAD.box).forEach(
-          ([key, value]) => (style[key] = 100 * value + "%")
-        );
+        
+        payload.boxs.map(({ id, box, style = {} }) => {
+          Object.entries(box).forEach(
+            ([key, value]) => (style[key] = 100 * value + "%")
+          );
 
-        this.state = {
-          style,
-          textContent: "Start editing to see some magic happen :)"
-        };
+          this.state = {
+            id,
+            style,
+            comment: "Start editing to see some magic happen :)"
+          };
 
-        console.log(123123, this.state);
-        return this.state;
-      })
-    );
+          console.log(123123, this.state);
+          return <div>this.state</div>;
+        });
+
+
+      }));
     payloads.subscribe(this.setState.bind(this));
   }
 
@@ -86,10 +92,10 @@ class App extends Component<AppProps, AppState> {
     return this.state ? (
       <div className="box">
         <Hello src={this.state.src} />
-        <div style={this.state.style}>{this.state.textContent}</div>
+        <div style={this.state.style}>{this.state.comment}</div>
       </div>
     ) : (
-      <div>foo</div>
+      <div />
     );
   }
 }
