@@ -18,13 +18,19 @@ interface AppState {
 
 interface BoxPayload {
   cctv: number;
-  box: {
-    top: number;
-    bottom: number;
-    left: number;
-    right: number;
-  };
-  style: React.CSSProperties;
+  timestamp?: Date;
+  boxs: [
+    {
+      box: {
+        top: number;
+        bottom: number;
+        left: number;
+        right: number;
+      };
+      style?: React.CSSProperties;
+      comment?:string;
+    }
+  ];
 }
 
 const socket = io("wss://proxy.hwangsehyun.com/webrtc-onvif", {
@@ -37,15 +43,19 @@ class App extends Component<AppProps, AppState> {
 
     const PAYLOAD: BoxPayload = {
       cctv: 0,
-      box: {
-        top: 0.1,
-        bottom: 0.2,
-        left: 0.3,
-        right: 0.4
-      },
-      style: {
-        color: "red"
-      }
+      boxs: [
+        {
+          box: {
+            top: 0.1,
+            bottom: 0.2,
+            left: 0.3,
+            right: 0.4
+          },
+          style: {
+            color: "red"
+          }
+        }
+      ]
     };
 
     const events = fromEvent(socket, "box");
@@ -53,6 +63,7 @@ class App extends Component<AppProps, AppState> {
 
     const payloads = events.pipe(
       map(([id, payload]) => {
+
         const style: React.CSSProperties =
           typeof payload.style === "object" ? payload.style : {};
         Object.entries(PAYLOAD.box).forEach(
