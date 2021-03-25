@@ -1,4 +1,4 @@
-import { Component, CSSProperties } from "react"
+import React, { Component, CSSProperties } from "react";
 
 export interface BoxPayload {
   cctv: number;
@@ -43,11 +43,15 @@ export interface AppState {
   comment: string;
 }
 
-
-
-export const getMedia ({ src }) =>
+export const getMedia = ({ src }) =>
   src ? (
     <video src={src} />
   ) : (
     <img src="https://i2-prod.belfastlive.co.uk/incoming/article13722455.ece/ALTERNATES/s615/1PNG.png" />
   );
+
+export const getBox = ({ id, style }) => {
+  <div style={style}>
+    <span style={{ background: style.borderColor }}>{id}</span>
+  </div>;
+};

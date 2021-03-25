@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { Component, ComponentState } from "react";
 import { render } from "react-dom";
-import { getMedia, AppState, BoxPayload } from "./Hello";
+import { getMedia, getBox, AppState, BoxPayload } from "./Hello";
 import "./style.css";
 
 import { fromEvent } from "rxjs";
@@ -17,8 +17,10 @@ const socket = io("wss://proxy.hwangsehyun.com/webrtc-onvif", {
   transports: ["websocket"]
 });
 
-class App extends Component<AppProps, AppState[]> {
+class App extends Component<AppProps, ComponentState> {
   src: string;
+
+  boxStates: AppState[];
 
   constructor(props) {
     super(props);
@@ -27,14 +29,31 @@ class App extends Component<AppProps, AppState[]> {
     const events = fromEvent(socket, "box");
     events.subscribe(console.log);
 
-    payloads.subscribe(this.setState.bind(this));
+    const payloads = events.pipe(
+      map(([id, payload]: [number, BoxPayload]) => payload.boxs.map(({ id, box, style = {} }) => {
+          Object.entries(box).forEach(
+            ([key, value]) => (style[key] = 100 * value + "%")
+          );
+
+          return {
+            id,
+            style,
+            comment: "Start editing to see some magic happen :)"
+          };
+        }))
+    );
+    payloads.subscribe(x=>{
+      this.boxStates = x;
+      this.setState({});
+    });
   }
 
   render() {
+    const {src} = this;
     return this.state ? (
       <div className="box">
-        {getMedia(this.src)}
-        <div style={this.state.style}>{this.state.comment}</div>
+        {getMedia({src})}
+        {this.boxStates.map(getBox)}
       </div>
     ) : (
       <div />
